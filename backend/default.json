@@ -1,0 +1,5 @@
+{
+"PORT": 5000,
+"PUBLIC_VAPID_KEY" : "<your public key>",
+"PRIVATE_VAPID_KEY" : "<your private key>"
+}
