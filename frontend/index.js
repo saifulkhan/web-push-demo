@@ -1,23 +1,46 @@
 /*jshint esversion: 8 */
 
-// Step 1: Check browser support
-const checkBrowserSupport = () => {
+let serviceWorker;
+let permission;
+
+
+
+async function init() {
+  console.log('Init');
+
+  // Step 1: Check browser support
+  checkBrowserSupport();
+
+  // Step 2: Request for permission - pop-up a notification in browser asking for allowing permission for showing notification
+  permission = await requestNotificationPermission();
+  console.log('Init: permission = ', permission);
+
+  // Step 3: Register service worker
+  if (permission === 'granted') {
+    //window.addEventListener('load', async () => {
+    serviceWorker = await registerServiceWorker();
+    //});
+  }
+}
+
+
+function checkBrowserSupport() {
   if (!("serviceWorker" in navigator)) {
     throw new Error("No Service Worker support!");
   }
   if (!("PushManager" in window)) {
     throw new Error("No Push API Support!");
   }
-};
+}
 
-// Step -2: Register service worker
-const registerServiceWorker = async () => {
-  const swRegistration = await navigator.serviceWorker.register("service.js");
-  return swRegistration;
-};
+async function registerServiceWorker() {
+  const serviceWorker = await navigator.serviceWorker.register('./service-worker.js');
+  console.log('index.js: init(): serviceWorker = ', serviceWorker);
+  return serviceWorker;
 
-// Step 3: Request for permission - pop-up a notification in browser asking for allowing permission for showing notification
-const requestNotificationPermission = async () => {
+}
+
+async function requestNotificationPermission() {
   const permission = await window.Notification.requestPermission();
   // value of permission can be 'granted', 'default', 'denied'
   // granted: user has accepted the request
@@ -27,24 +50,4 @@ const requestNotificationPermission = async () => {
     throw new Error("Permission not granted for Notification");
   }
   return permission;
-};
-
-// Step 4: Show a local notification, just for test purpose
-const showLocalNotification = (title, body, swRegistration) => {
-  const options = {
-      body,
-      // here you can add more properties like icon, image, vibrate, etc.
-  };
-  swRegistration.showNotification(title, options);
-};
-
-const onClickAskPermission = async () => {
-  console.log('index.js: onClickAskPermission:');
-  
-  checkBrowserSupport();
-  const swRegistration = await registerServiceWorker();
-  const permission = await requestNotificationPermission();
-
-  console.log('index.js: onClickAskPermission: permission = ', permission);
-  showLocalNotification('Local Notification', 'Permission ' + permission, swRegistration);
 }
