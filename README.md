@@ -11,7 +11,7 @@ Main libraries and frameworks used:
 ```sh
 cd backend
 npm install
-node index.js
+npm run dev
 ```
 
 **Starting frontend:**
